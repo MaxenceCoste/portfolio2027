@@ -1,0 +1,786 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProjectBlocks from '../../components/ProjectBlocks.astro';
+import RichText from '../../components/RichText.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { projects, type Project } from '../../data/projects';
+
+export function getStaticPaths() {
+  return projects.map((project, index) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      prevProject: projects[(index - 1 + projects.length) % projects.length],
+      nextProject: projects[(index + 1) % projects.length],
+    },
+  }));
+}
+
+interface Props {
+  project: Project;
+  prevProject: Project;
+  nextProject: Project;
+}
+
+const { project, prevProject, nextProject } = Astro.props;
+const bottomCta = project.closing?.cta ?? (
+  project.externalLink
+    ? {
+        url: project.externalLink.url,
+        label: 'Visiter le site en ligne',
+        external: true,
+      }
+    : undefined
+);
+---
+
+<Layout title={`${project.title} — Maxence Coste`} description={project.subtitle}>
+  <main class="project-page">
+    <!-- Arrière-plan ambiant monochrome -->
+    <div class="page-ambient" aria-hidden="true">
+      <div class="ambient-grid"></div>
+      <div class="ambient-orb ambient-orb-top"></div>
+      <div class="ambient-orb ambient-orb-mid"></div>
+    </div>
+
+    <!-- Barre de navigation supérieure -->
+    <header class="detail-topbar">
+      <div class="detail-topbar-inner">
+        <a href="/#decouvrir" class="liquid-glass-pill back-pill">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            class="pill-arrow"
+            aria-hidden="true"
+          >
+            <path
+              d="M12.5 8H3.5M3.5 8L7.5 4M3.5 8L7.5 12"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Retour aux projets</span>
+        </a>
+
+        <div class="topbar-badge liquid-glass-pill" aria-label={`Projet ${project.number}`}>
+          <span class="topbar-num">{project.number}</span>
+          <span class="topbar-sep" aria-hidden="true">·</span>
+          <span class="topbar-ctx">{project.context}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- En-tête du projet -->
+    <section class="detail-hero">
+      <div class="detail-container">
+        <div class="hero-tag-row">
+          <span class="project-tag liquid-glass-pill">
+            <span>{project.tag}</span>
+          </span>
+        </div>
+
+        <h1 class="detail-title">{project.title}</h1>
+        <p class="detail-subtitle">{project.subtitle}</p>
+
+        <div class="detail-note-row">
+          <p class="detail-note">{project.note}</p>
+          {
+            project.externalLink && (
+              <a
+                href={project.externalLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="liquid-glass-pill live-link-pill"
+              >
+                <span>{project.externalLink.label}</span>
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  class="pill-arrow"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4.5 11.5L11.5 4.5M11.5 4.5H6M11.5 4.5V10"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </a>
+            )
+          }
+        </div>
+
+        <dl class="project-meta-grid">
+          {
+            project.meta.map((item) => (
+              <div class="meta-card liquid-glass">
+                <dt class="meta-label">{item.label}</dt>
+                <dd class="meta-value">{item.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </section>
+
+    <!-- Sections détaillées -->
+    <div class="detail-sections">
+      {
+        project.sections.map((section) => (
+          <section
+            class:list={[
+              'detail-section',
+              'detail-reveal',
+              { 'detail-section-highlight': section.highlight },
+            ]}
+          >
+            <div class="detail-container">
+              {(section.heading || section.intro) && (
+                <header class="section-head">
+                  {section.heading && (
+                    <h2 class="section-heading">{section.heading}</h2>
+                  )}
+                  {section.intro && (
+                    <p class="section-intro">
+                      <RichText text={section.intro} />
+                    </p>
+                  )}
+                </header>
+              )}
+
+              <div class="detail-two-col">
+                <div class="detail-col">
+                  <ProjectBlocks blocks={section.left} />
+                </div>
+                <div class="detail-col">
+                  <ProjectBlocks blocks={section.right} />
+                </div>
+              </div>
+            </div>
+          </section>
+        ))
+      }
+    </div>
+
+    <!-- Conclusion & Navigation inter-projets -->
+    <section class="detail-bottom detail-reveal">
+      <div class="detail-container">
+        {
+          project.closing && (
+            <div class="closing-card liquid-glass">
+              <div class="closing-inner">
+                <h2 class="closing-title">{project.closing.title}</h2>
+                <p class="closing-text">
+                  <RichText text={project.closing.text} />
+                </p>
+              </div>
+            </div>
+          )
+        }
+
+        <div class="bottom-actions">
+          <a href="/#decouvrir" class="liquid-glass-pill action-pill">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              class="pill-arrow"
+              aria-hidden="true"
+            >
+              <path
+                d="M12.5 8H3.5M3.5 8L7.5 4M3.5 8L7.5 12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Retour aux projets</span>
+          </a>
+
+          {
+            bottomCta && (
+              <a
+                href={bottomCta.url}
+                target={bottomCta.external ? '_blank' : undefined}
+                rel={bottomCta.external ? 'noopener noreferrer' : undefined}
+                class="cta-dark-pill"
+              >
+                <span>{bottomCta.label}</span>
+                {bottomCta.external && (
+                  <svg
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    class="pill-arrow"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M4.5 11.5L11.5 4.5M11.5 4.5H6M11.5 4.5V10"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                )}
+              </a>
+            )
+          }
+        </div>
+
+        <nav class="project-pager-grid" aria-label="Autres projets">
+          <a href={`/projets/${prevProject.slug}`} class="pager-card liquid-glass">
+            <span class="pager-dir">← Projet précédent</span>
+            <strong class="pager-title">{prevProject.title}</strong>
+            <span class="pager-meta">
+              {prevProject.number} · {prevProject.context}
+            </span>
+          </a>
+
+          <a
+            href={`/projets/${nextProject.slug}`}
+            class="pager-card pager-card-next liquid-glass"
+          >
+            <span class="pager-dir">Projet suivant →</span>
+            <strong class="pager-title">{nextProject.title}</strong>
+            <span class="pager-meta">
+              {nextProject.number} · {nextProject.context}
+            </span>
+          </a>
+        </nav>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<script>
+  const revealNodes = document.querySelectorAll<HTMLElement>('.detail-reveal');
+
+  if (revealNodes.length > 0) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.08 }
+    );
+
+    for (const node of revealNodes) {
+      if (node.getBoundingClientRect().top < window.innerHeight * 0.92) {
+        node.classList.add('is-visible');
+      } else {
+        observer.observe(node);
+      }
+    }
+  }
+</script>
+
+<style>
+  .project-page {
+    position: relative;
+    background-color: var(--bg-white);
+    overflow-x: clip;
+  }
+
+  .page-ambient {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .ambient-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.032) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.032) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(
+      ellipse 80% 74% at 50% 40%,
+      rgba(0, 0, 0, 0.9) 25%,
+      transparent 100%
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse 80% 74% at 50% 40%,
+      rgba(0, 0, 0, 0.9) 25%,
+      transparent 100%
+    );
+  }
+
+  .ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(76px);
+  }
+
+  .ambient-orb-top {
+    width: clamp(320px, 40vw, 560px);
+    height: clamp(320px, 40vw, 560px);
+    top: 4%;
+    left: 6%;
+    background: radial-gradient(
+      circle,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.025) 50%,
+      transparent 75%
+    );
+  }
+
+  .ambient-orb-mid {
+    width: clamp(280px, 34vw, 460px);
+    height: clamp(280px, 34vw, 460px);
+    bottom: 10%;
+    right: 6%;
+    background: radial-gradient(
+      circle,
+      rgba(0, 0, 0, 0.065) 0%,
+      rgba(180, 180, 190, 0.08) 48%,
+      transparent 75%
+    );
+  }
+
+  .detail-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    width: 100%;
+    margin: 0 auto;
+    padding-inline: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  /* Barre supérieure sticky */
+  .detail-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 1.25rem clamp(1.5rem, 4vw, 3rem);
+    pointer-events: none;
+  }
+
+  .detail-topbar-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .back-pill,
+  .topbar-badge {
+    pointer-events: auto;
+    padding: 0.55rem 1.05rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+
+  .back-pill span,
+  .topbar-badge span,
+  .pill-arrow {
+    position: relative;
+    z-index: 2;
+  }
+
+  .topbar-badge {
+    cursor: default;
+    color: var(--text-secondary);
+  }
+
+  .topbar-num {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .topbar-sep {
+    color: var(--text-tertiary);
+  }
+
+  .pill-arrow {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  /* Hero projet */
+  .detail-hero {
+    position: relative;
+    z-index: 1;
+    padding: clamp(2rem, 5vw, 3.75rem) 0 clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .hero-tag-row {
+    margin-bottom: 1.25rem;
+    animation: apple-reveal-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+  }
+
+  .project-tag {
+    padding: 0.42rem 0.95rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--text-secondary);
+  }
+
+  .project-tag span {
+    position: relative;
+    z-index: 2;
+  }
+
+  .detail-title {
+    font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+    font-weight: 600;
+    letter-spacing: -0.038em;
+    line-height: 1.02;
+    color: var(--text-primary);
+    max-width: 18ch;
+    animation: apple-reveal-up 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+  }
+
+  .detail-subtitle {
+    margin-top: 1.15rem;
+    font-size: clamp(1.0625rem, 1.8vw, 1.375rem);
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: -0.015em;
+    color: var(--text-secondary);
+    max-width: 58ch;
+    animation: apple-reveal-up 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+  }
+
+  .detail-note-row {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1.15rem;
+    animation: apple-reveal-up 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  }
+
+  .detail-note {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--text-tertiary);
+    max-width: 62ch;
+  }
+
+  .live-link-pill {
+    padding: 0.48rem 0.95rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .live-link-pill span {
+    position: relative;
+    z-index: 2;
+  }
+
+  .project-meta-grid {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+    animation: apple-reveal-up 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.38s both;
+  }
+
+  .meta-card {
+    border-radius: 20px;
+    padding: 1.15rem 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .meta-label,
+  .meta-value {
+    position: relative;
+    z-index: 2;
+  }
+
+  .meta-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .meta-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+
+  /* Sections de contenu */
+  .detail-sections {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-section {
+    padding: clamp(2.5rem, 5vw, 4.25rem) 0;
+  }
+
+  .detail-section-highlight {
+    background-color: rgba(245, 245, 247, 0.72);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .section-head {
+    margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 68ch;
+  }
+
+  .section-heading {
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    color: var(--text-primary);
+  }
+
+  .section-intro {
+    font-size: 1.03125rem;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    color: var(--text-secondary);
+  }
+
+  .section-intro :global(strong) {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .detail-two-col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+
+  .detail-col {
+    min-width: 0;
+  }
+
+  /* Bas de page projet */
+  .detail-bottom {
+    position: relative;
+    z-index: 1;
+    padding: clamp(2.5rem, 5vw, 4.5rem) 0 clamp(3.5rem, 6vw, 5.5rem);
+  }
+
+  .closing-card {
+    border-radius: 28px;
+    padding: clamp(1.75rem, 3.5vw, 2.75rem);
+    margin-bottom: 2.25rem;
+  }
+
+  .closing-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 66ch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .closing-title {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+  }
+
+  .closing-text {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .closing-text :global(.rich-link) {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(0, 0, 0, 0.25);
+  }
+
+  .closing-text :global(.rich-link:hover) {
+    text-decoration-color: var(--text-primary);
+  }
+
+  .bottom-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .action-pill {
+    padding: 0.72rem 1.35rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .action-pill span {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-dark-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.74rem 1.4rem;
+    border-radius: 9999px;
+    background-color: var(--text-primary);
+    color: var(--bg-white);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.35);
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s ease,
+      background-color 0.2s ease;
+  }
+
+  .cta-dark-pill:hover {
+    transform: translateY(-2px);
+    background-color: #1c1c20;
+    box-shadow: 0 16px 34px -10px rgba(0, 0, 0, 0.45);
+  }
+
+  .cta-dark-pill:focus-visible,
+  .pager-card:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 3px;
+  }
+
+  .project-pager-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .pager-card {
+    border-radius: 24px;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .pager-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--glass-shadow-hover);
+  }
+
+  .pager-card-next {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .pager-dir,
+  .pager-title,
+  .pager-meta {
+    position: relative;
+    z-index: 2;
+  }
+
+  .pager-dir {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+  }
+
+  .pager-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .pager-meta {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  /* Apparition douce des sections */
+  .detail-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(8px);
+    transition:
+      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .detail-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  @keyframes apple-reveal-up {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+      filter: blur(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .detail-two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .project-pager-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pager-card-next {
+      text-align: left;
+      align-items: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+interface Props {
+  text: string;
+}
+
+type Token =
+  | { kind: 'text'; value: string }
+  | { kind: 'strong'; value: string }
+  | { kind: 'em'; value: string }
+  | { kind: 'code'; value: string }
+  | { kind: 'link'; label: string; href: string };
+
+const { text } = Astro.props;
+
+const TOKEN_RE = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+
+const tokenize = (input: string): Token[] => {
+  const tokens: Token[] = [];
+  let lastIndex = 0;
+
+  for (const match of input.matchAll(TOKEN_RE)) {
+    const raw = match[0];
+    const index = match.index ?? 0;
+
+    if (index > lastIndex) {
+      tokens.push({ kind: 'text', value: input.slice(lastIndex, index) });
+    }
+
+    if (raw.startsWith('**') && raw.endsWith('**')) {
+      tokens.push({ kind: 'strong', value: raw.slice(2, -2) });
+    } else if (raw.startsWith('*') && raw.endsWith('*')) {
+      tokens.push({ kind: 'em', value: raw.slice(1, -1) });
+    } else if (raw.startsWith('`') && raw.endsWith('`')) {
+      tokens.push({ kind: 'code', value: raw.slice(1, -1) });
+    } else if (raw.startsWith('[')) {
+      const sep = raw.indexOf('](');
+      if (sep !== -1) {
+        tokens.push({
+          kind: 'link',
+          label: raw.slice(1, sep),
+          href: raw.slice(sep + 2, -1),
+        });
+      } else {
+        tokens.push({ kind: 'text', value: raw });
+      }
+    }
+
+    lastIndex = index + raw.length;
+  }
+
+  if (lastIndex < input.length) {
+    tokens.push({ kind: 'text', value: input.slice(lastIndex) });
+  }
+
+  return tokens;
+};
+
+const tokens = tokenize(text);
+---
+
+{
+  tokens.map((token) => {
+    if (token.kind === 'strong') return <strong>{token.value}</strong>;
+    if (token.kind === 'em') return <em>{token.value}</em>;
+    if (token.kind === 'code') return <code>{token.value}</code>;
+    if (token.kind === 'link') {
+      return (
+        <a
+          href={token.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rich-link"
+        >
+          {token.label}
+        </a>
+      );
+    }
+    return token.value;
+  })
+}

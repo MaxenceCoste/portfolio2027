@@ -1,0 +1,356 @@
+---
+---
+
+<!-- Footer style Apple -->
+<footer id="contact" class="site-footer" aria-label="Pied de page et contact">
+  <div class="footer-inner">
+    <div class="footer-cta footer-reveal">
+      <p class="section-eyebrow">Contact</p>
+      <h2 class="footer-title">
+        Travaillons ensemble. <span>Disponible dès avril 2027.</span>
+      </h2>
+      <p class="footer-subtitle">
+        À la recherche d'un stage de 3 mois en développement web Front-End.
+      </p>
+
+      <div class="footer-actions">
+        <button
+          type="button"
+          class="footer-action-link"
+          data-copy-email="maxence.coste.mc@gmail.com"
+          aria-label="Copier l'adresse email maxence.coste.mc@gmail.com"
+        >
+          <svg
+            class="footer-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <rect
+              x="3"
+              y="5"
+              width="18"
+              height="14"
+              rx="3"
+              stroke="currentColor"
+              stroke-width="1.75"
+            />
+            <path
+              d="M4 7.5L10.76 12.23C11.5 12.75 12.5 12.75 13.24 12.23L20 7.5"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span>maxence.coste.mc@gmail.com</span>
+          <span class="copy-feedback" aria-live="polite">Copié !</span>
+        </button>
+
+        <a
+          href="/CV_Maxence_Coste_Developpeur_FrontEnd.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-action-link"
+        >
+          <svg
+            class="footer-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 4V15M12 15L7.5 10.5M12 15L16.5 10.5M5 19H19"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>Télécharger mon CV</span>
+        </a>
+
+        <a
+          href="https://www.linkedin.com/in/maxence-c-62aaa0264/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-action-link"
+        >
+          <span>LinkedIn</span>
+          <svg
+            class="footer-arrow"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4.5 11.5L11.5 4.5M11.5 4.5H6M11.5 4.5V10"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <hr class="footer-divider" />
+
+    <div class="footer-legal footer-reveal">
+      <p class="footer-copyright">
+        Copyright © 2027 Maxence Coste. Tous droits réservés.
+      </p>
+
+      <div class="footer-meta">
+        <button type="button" class="footer-top-btn" id="back-to-top">
+          Haut de page ↑
+        </button>
+        <span class="footer-locale">France</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const attachCopyEmail = (button: Element) => {
+    let timeoutId: number | undefined;
+    button.addEventListener('click', async () => {
+      const email =
+        button.getAttribute('data-email') ??
+        button.getAttribute('data-copy-email');
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        button.classList.add('copied');
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => {
+          button.classList.remove('copied');
+        }, 1800);
+      } catch {
+        // Presse-papiers indisponible
+      }
+    });
+  };
+
+  document
+    .querySelectorAll('#copy-email, [data-copy-email]')
+    .forEach(attachCopyEmail);
+
+  const siteFooter = document.querySelector<HTMLElement>('.site-footer');
+  const backToTopBtn = document.getElementById('back-to-top');
+
+  if (siteFooter) {
+    const footerObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            siteFooter.classList.add('is-visible');
+            footerObserver.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15 }
+    );
+    footerObserver.observe(siteFooter);
+  }
+
+  backToTopBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+<style>
+  .site-footer {
+    width: 100%;
+    background-color: var(--bg-subtle);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .footer-inner {
+    max-width: 1220px;
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(3rem, 6vw, 4.75rem) clamp(1.75rem, 4vw, 3.5rem)
+      clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .footer-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section-eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .footer-title {
+    margin-top: 0.65rem;
+    font-size: clamp(2rem, 4vw, 3.15rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    color: var(--text-primary);
+  }
+
+  .footer-title span {
+    color: var(--text-tertiary);
+  }
+
+  .footer-subtitle {
+    margin-top: 0.85rem;
+    font-size: clamp(0.95rem, 1.2vw, 1.0625rem);
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    color: var(--text-secondary);
+    max-width: 56ch;
+  }
+
+  .footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2.25rem;
+    margin-top: 1.85rem;
+  }
+
+  .footer-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    padding: 0.2rem 0;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #515154;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .footer-action-link:hover {
+    color: #000000;
+  }
+
+  .footer-action-link:focus-visible,
+  .footer-top-btn:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
+  .copy-feedback {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #000000;
+    opacity: 0;
+    transform: translateY(2px);
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .footer-action-link.copied .copy-feedback {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .footer-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+  }
+
+  .footer-arrow {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .footer-divider {
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin: clamp(2.25rem, 4vw, 3.25rem) 0 1.35rem;
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+    color: var(--text-tertiary);
+  }
+
+  .footer-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .footer-top-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #515154;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .footer-top-btn:hover {
+    color: #000000;
+  }
+
+  .footer-locale {
+    color: var(--text-secondary);
+  }
+
+  .site-footer .footer-reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(8px);
+    transition:
+      opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1.05s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .site-footer.is-visible .footer-reveal {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  .site-footer.is-visible .footer-cta {
+    transition-delay: 0.06s;
+  }
+
+  .site-footer.is-visible .footer-legal {
+    transition-delay: 0.18s;
+  }
+
+  @media (max-width: 768px) {
+    .footer-inner {
+      padding: 2.5rem 1.5rem 1.75rem;
+    }
+
+    .footer-legal {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.9rem;
+    }
+  }
+</style>
